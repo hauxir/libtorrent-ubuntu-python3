@@ -1,10 +1,12 @@
-# Based on https://github.com/git-sinaptika/libtorrent/blob/master/1.1.6/Dockerfile
-# alpine with Python 3.6.6 and pip 10.0.1
-FROM alpine:3.8
+FROM ubuntu:bionic
 
 ENV \
-  LIBTORRENT_VERSION="1.2.0-rc" \
-  _LIBTORRENT_VERSION="1_2_0_RC"
+  LIBTORRENT_VERSION="1.2.4" \
+  _LIBTORRENT_VERSION="1_2_4"
+
+RUN apt-get update
+
+RUN apt-get install -y python3 python3-dev wget build-essential libboost-system-dev libssl-dev libboost-dev libboost-all-dev python3-pip
 
 WORKDIR \
   /opt
@@ -14,8 +16,6 @@ WORKDIR \
 #If building locally, you can run make -j$(nproc),
 #but you might get issues with swap/out of memory
 RUN \
-  apk add --no-cache --virtual .build_libtorrent \
-    wget ca-certificates alpine-sdk boost-dev libressl-dev python3-dev && \
   wget -qO-\
     https://github.com/arvidn/libtorrent/releases/download/libtorrent-${_LIBTORRENT_VERSION}/libtorrent-rasterbar-${LIBTORRENT_VERSION}.tar.gz | \
     tar xvz && \
@@ -36,9 +36,10 @@ RUN \
   strip /usr/lib/python3.6/site-packages/libtorrent.cpython*.so && \
   cd /opt && \
   rm -rf libtorrent-rasterbar-${LIBTORRENT_VERSION} && \
-  apk del .build_libtorrent && \
-  apk add --no-cache --virtual .runtime_libtorrent \
-    boost-python3 boost-system libgcc libstdc++ python3 && \
-  ldconfig /usr/lib && \
-  if [ -f /usr/bin/python ] ; then rm /usr/bin/python; fi && ln -s /usr/bin/python3 /usr/bin/python && \
-  if [ -f /usr/bin/pip ] ; then rm /usr/bin/pip; fi && ln -s /usr/bin/pip3 /usr/bin/pip
+  ldconfig /usr/lib
+
+RUN rm /usr/bin/python
+
+RUN ln -sv /usr/lib/python3.6/site-packages /usr/lib/python3.6/dist-packages
+RUN ln /usr/bin/python3 /usr/bin/python
+RUN ln /usr/bin/pip3 /usr/bin/pip
