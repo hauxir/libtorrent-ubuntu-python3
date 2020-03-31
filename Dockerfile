@@ -1,8 +1,8 @@
 FROM ubuntu:bionic
 
 ENV \
-  LIBTORRENT_VERSION="1.2.4" \
-  _LIBTORRENT_VERSION="1_2_4"
+  LIBTORRENT_VERSION="1.2.5" \
+  _LIBTORRENT_VERSION="1_2_5"
 
 RUN apt-get update
 
